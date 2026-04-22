@@ -19,6 +19,12 @@ def test_users():
     data_file = Path(__file__).parent / "test-data" / "users.json"
     with open(data_file) as f:
         return json.load(f)
+    
+@pytest.fixture(scope="session")
+def test_products():
+    data_file = Path(__file__).parent /  "test-data" / "product_prices.json"
+    with open(data_file) as f:
+        return json.load(f)
 
 @pytest.fixture
 def logged_in_inventory(page, test_users):
@@ -29,5 +35,11 @@ def logged_in_inventory(page, test_users):
    
     inventory = InventoryPage(page)
     inventory.should_be_loaded()  
-    
+
     return inventory
+
+@pytest.fixture
+def inventory_with_item(logged_in_inventory, test_products):
+        product = test_products["test_product"]
+        logged_in_inventory.add_to_cart(product)
+        return logged_in_inventory
