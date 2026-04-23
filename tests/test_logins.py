@@ -12,12 +12,13 @@ def test_fail_login(login_page, test_users):
     expect(login_page.error_message_text).to_contain_text("Username and password do not matc")
     expect(login_page.error_button_close).to_be_visible()
 
-def test_fail_close_error_try_again_success(login_page, inventory_page):
+def test_fail_close_error_try_again_success(login_page, inventory_page, test_users):
     login_page.login("stan", "secret_sauce")
-    expect(login_page.error_message_text).to_contain_text("Username and password do not matc")
+    expect(login_page.error_message_text).to_contain_text("Username and password do not match")
 
     login_page.error_button_close.click()
-    login_page.login("standard_user", "secret_sauce")
+    user = test_users["valid_user"]
+    login_page.login(user["username"], user["password"])
     expect(inventory_page.shopping_cart).to_be_visible()
 
 def test_no_password_login(login_page):
@@ -47,7 +48,7 @@ def test_cannot_access_inventory_after_logout(logged_in_inventory, page):
     logged_in_inventory.navigate()
     LoginPage(page).should_be_on_login_page()
 
-""""
+"""
 def test_problem_user_login(login_page, test_users, inventory_page):
     user = test_users["problem_user"]
     login_page.login(user["username"], user["password"])

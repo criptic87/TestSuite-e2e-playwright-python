@@ -5,9 +5,7 @@ class InventoryPage:
         self.page = page
         self.url = "https://www.saucedemo.com/inventory.html"
         self.shopping_cart = page.locator('[data-test="shopping-cart-link"]')
-        self.add_to_cart_button = page.locator('[data-test="add-to-cart-sauce-labs-backpack"]')
         self.cart_badge = page.locator('[data-test="shopping-cart-badge"]')
-        self.image_src = page.locator('')
         self.menu_button = page.locator('#react-burger-menu-btn')
         self.logout_button = page.locator('[data-test="logout-sidebar-link"]')
         self.sorting_button = page.locator('[data-test="product-sort-container"]')
@@ -55,7 +53,7 @@ class InventoryPage:
             item = items.nth(i)
             name = item.locator(".inventory_item_name").inner_text()
             if name == product_name:
-             return item.locator(".inventory_item_price").inner_text()
+                return item.locator(".inventory_item_price").inner_text()
         return None
 
     def sort_product(self, value):

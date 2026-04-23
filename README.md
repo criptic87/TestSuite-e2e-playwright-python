@@ -4,27 +4,33 @@
 
 A professional end-to-end UI automation suite built with `pytest` and `Playwright` against the [Sauce Demo](https://www.saucedemo.com/) application.
 
-This project is designed to validate critical user journeys such as authentication, inventory interactions, and product data checks through a maintainable Page Object Model structure.
+This project validates critical user journeys — authentication, inventory interactions, product data integrity, and sorting behaviour — through a maintainable Page Object Model structure with externalized test data and CI integration.
+
+---
 
 ## Current Status
 
-The suite is actively under development and should be considered a work in progress. New tests, better coverage, and additional automation best practices are being added continuously as the framework evolves.
+The suite is actively under development. New tests, broader coverage, and additional automation best practices are being added continuously.
 
-At the moment, the latest local execution completed with:
+Latest local execution:
 
-- `19` passing tests
+- **22** passing tests
 - Chromium browser coverage
-- Execution time of approximately `19s`
+- Execution time approximately **22s**
+
+---
 
 ## Tech Stack
 
-- Python
-- Pytest
+- Python 3.13
+- pytest
 - Playwright
 - Page Object Model (POM)
-- GitHub Actions workflow
-- Jenkins pipeline placeholder
-- Allure result/report folders for test artifacts
+- GitHub Actions (primary CI)
+- Jenkins (pipeline placeholder)
+- Allure (reporting-ready)
+
+---
 
 ## Project Structure
 
@@ -48,33 +54,60 @@ At the moment, the latest local execution completed with:
     `-- test_inventory_products.py
 ```
 
-## Coverage So Far
+---
 
-The current automated checks focus on:
+## Coverage
 
-- Successful login flows
-- Invalid login validation and error handling
-- Required field validation for username and password
-- Locked user access restrictions
-- Session persistence and logout behavior
-- Inventory page access control
-- Add-to-cart and remove-from-cart actions
-- Product price presence and price verification against test data
-- Parameterized product coverage for multiple inventory items
+**Authentication**
+- Successful login with valid credentials
+- Invalid credentials error handling and message validation
+- Required field validation (missing username, missing password)
+- Locked-out user access restriction
+- Session persistence after page refresh
+- Logout and post-logout access control
+- Redirect to login when accessing protected routes unauthenticated
+- Close error message and retry login flow
 
-## Framework Highlights
+**Inventory**
+- Inventory page load verification
+- Add to cart — single and multiple items
+- Parametrized add-to-cart across all six products
+- Remove from cart and badge count reset
+- Product price presence validation for all items
+- Product price accuracy verified against external test data
+- Product sorting by name A-Z and Z-A (parametrized)
+- Product sorting by price low-to-high and high-to-low (parametrized)
 
-- Reusable page objects for login and inventory screens
-- Centralized fixtures in `conftest.py`
-- Externalized test data through JSON files
-- Failure-focused artifact retention configured in `pytest.ini`
-  - Screenshots on failure
-  - Videos on failure
-  - Traces on failure
+---
+
+## Key Design Decisions
+
+**Page Object Model** — selectors and actions live in page classes, not in tests. When a selector changes, one line updates in the page object and all tests that use it stay green.
+
+**Fixture hierarchy** — `login_page` → `logged_in_inventory` → `inventory_with_item` build on each other. Tests request only the state they need, with no repeated setup code.
+
+**Externalized test data** — credentials and product data live in JSON files, not hardcoded in tests. Data can change without touching test logic.
+
+**Auto-waiting over hard waits** — `expect()` assertions and Playwright actions wait automatically. No `time.sleep()` anywhere in the suite.
+
+**Parametrized tests for variation** — sorting direction and product selection use `@pytest.mark.parametrize` to cover multiple scenarios from a single test definition, keeping the suite DRY and output readable.
+
+**Failure artifacts** — screenshots, videos, and Playwright traces are captured automatically on failure, making CI failures diagnosable without reproducing locally.
+
+---
 
 ## Installation
 
-Create and activate a virtual environment, then install the dependencies:
+**Linux / macOS:**
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+playwright install chromium
+```
+
+**Windows (PowerShell):**
 
 ```powershell
 python -m venv .venv
@@ -83,51 +116,81 @@ pip install -r requirements.txt
 playwright install chromium
 ```
 
+---
+
 ## Running The Tests
 
-Run the full suite with:
+```bash
+# Run the full suite
+pytest
 
-```powershell
-.\.venv\Scripts\python.exe -m pytest
+# Run with visible browser
+pytest --headed
+
+# Run a specific file
+pytest tests/test_logins.py -v
+
+# Run a specific test
+pytest tests/test_logins.py::test_session_persists_on_refresh -v
 ```
 
-Run a specific test module with:
+---
 
-```powershell
-.\.venv\Scripts\python.exe -m pytest tests\test_logins.py -v
-```
+## Framework Highlights
+
+- Reusable page objects for login and inventory screens
+- Centralized fixtures in `conftest.py` with clear state hierarchy
+- Externalized test data through JSON files for users and products
+- Failure-focused artifact retention configured in `pytest.ini`
+  - Screenshots on failure
+  - Videos on failure
+  - Playwright traces on failure
+
+---
 
 ## CI
 
-The repository currently includes a GitHub Actions workflow as the main CI setup. The workflow in `.github/workflows/test_push&pr.yml` runs on:
+The GitHub Actions workflow at `.github/workflows/test_push&pr.yml` triggers on:
 
 - Push events to `main`
 - Pull requests targeting `main`
 
-It currently performs:
+Each run performs:
 
 - Source checkout
-- Python `3.13` setup
-- Dependency installation
-- Playwright browser installation
-- Test execution
+- Python 3.13 setup
+- Dependency installation via `requirements.txt`
+- Playwright Chromium browser installation
+- Full test suite execution
 
-The repository also contains a `Jenkinsfile`, kept as an additional/backup CI option for future use if needed.
+The repository also includes a `Jenkinsfile` as an alternative CI option for Jenkins-based pipelines.
+
+---
 
 ## Reporting
 
-The project already contains `allure-results/` and `allure-report/` directories, which makes it ready to support richer test reporting as the framework continues to mature.
+The project is Allure-ready. The `allure-results/` and `allure-report/` directories are in place to support richer HTML reporting as the framework matures.
+
+To generate and open an Allure report locally (requires Allure CLI):
+
+```bash
+allure serve allure-results
+```
+
+---
 
 ## Roadmap
 
-Planned and ongoing improvements include:
+- Cart page and checkout flow coverage
+- End-to-end test: login → add items → checkout → confirm
+- Problem user behaviour validation (broken images, non-functional buttons)
+- Performance glitch user timeout handling
+- Cross-browser execution (Firefox, WebKit)
+- Allure report integration in CI pipeline
+- Expanded negative-path and edge case scenarios
 
-- Expanding test coverage across additional user journeys
-- Strengthening assertions and negative-path scenarios
-- Adding more reusable utilities and best practices
-- Improving CI/reporting quality
-- Continuing to refine maintainability and readability standards
+---
 
 ## Notes
 
-This repository is not a finished framework yet. It is being improved incrementally, with new tests and better automation practices added on a regular basis.
+This repository is being built incrementally as a portfolio project and learning exercise. It is not a finished framework — new tests and improvements are added on a regular basis.
