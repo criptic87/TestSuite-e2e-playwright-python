@@ -1,5 +1,7 @@
 # UI Test Automation Suite
 
+[![Playwright Tests](https://github.com/criptic87/TestSuite-e2e-playwright-python/actions/workflows/test_push&pr.yml/badge.svg)](https://github.com/criptic87/TestSuite-e2e-playwright-python/actions/workflows/test_push&pr.yml)
+
 A professional end-to-end UI automation suite built with `pytest` and `Playwright` against the [Sauce Demo](https://www.saucedemo.com/) application.
 
 This project is designed to validate critical user journeys such as authentication, inventory interactions, and product data checks through a maintainable Page Object Model structure.
