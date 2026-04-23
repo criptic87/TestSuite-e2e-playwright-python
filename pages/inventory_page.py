@@ -10,6 +10,9 @@ class InventoryPage:
         self.image_src = page.locator('')
         self.menu_button = page.locator('#react-burger-menu-btn')
         self.logout_button = page.locator('[data-test="logout-sidebar-link"]')
+        self.sorting_button = page.locator('[data-test="product-sort-container"]')
+        self.product_names = page.locator(".inventory_item_name")
+        self.product_prices = page.locator(".inventory_item_price")
     
     def should_be_loaded(self):
         expect(self.page).to_have_url(self.url)
@@ -53,4 +56,17 @@ class InventoryPage:
             name = item.locator(".inventory_item_name").inner_text()
             if name == product_name:
              return item.locator(".inventory_item_price").inner_text()
-        return None                             
+        return None
+
+    def sort_product(self, value):
+        self.sorting_button.select_option(value)
+    
+    def get_product_names(self):
+        return self.product_names.all_inner_texts()
+
+    def get_product_prices(self):
+        return self.product_prices.all_inner_texts()
+
+    def get_prices_as_number(self):
+        prices = self.get_product_prices()
+        return [float(p.replace("$", "")) for p in prices]
